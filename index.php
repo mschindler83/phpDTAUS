@@ -41,7 +41,7 @@ $type = 'L';
 $typeDetailed = '05';
 
 // Create the phpDTAUS object
-$dtaus = new phpDTAUS($originator_name, $originator_bankcode, $originator_account);
+$dtaus = new phpDTAUS($originator_name, $originator_bankcode, $originator_account, $type);
 
 // This mapping shows the readCsv method where (which column) to look for the required information in the CSV file
 $mapping = array(
@@ -50,7 +50,6 @@ $mapping = array(
 	'account' => 4,
 	'amount' => 5,
 	'ref' => 6,
-	'type' => 7,
 	'customerId' => 1
 );
 

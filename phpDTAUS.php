@@ -92,6 +92,8 @@ class phpDTAUS
      */
     protected $_originatorName;
     
+    protected $_type;
+    
     /**
      * Constructor. Checks input parameters and stores them in the appropriate member variables.
      * Throws an InvalidArgumentException in case one or more parameters do not meet the given
@@ -103,7 +105,7 @@ class phpDTAUS
      * @param integer $originatorBankCode Bank code of the originator's bank
      * @param integer $originatorAccount Account number of the originator
      */
-    public function __construct($originatorName, $originatorBankCode, $originatorAccount)
+    public function __construct($originatorName, $originatorBankCode, $originatorAccount, $type = 'L')
     {
         if (strlen(trim($originatorName)) == 0) {
             throw new InvalidArgumentException('Please set the name of the originator of the transfer.');
@@ -121,9 +123,21 @@ class phpDTAUS
             throw new InvalidArgumentException('Please check the account number of the originator of the transfer. German account numbers cannot be longer than 10 digits. The account number you enteres was ' . strlen(trim($originatorAccount)) . ' digits long.');
         }
         
+        if (strlen(trim($type)) == 0) {
+            throw new InvalidArgumentException('Please enter the type of the transactions.');
+        } elseif (strtoupper($type) != 'L' && strtoupper($type) != 'G') {
+            throw new InvalidArgumentException('The two possible transaction types are \'L\' for direct debit or \'G\' for wire transfers.');
+        }
+
         $this->_originatorName = trim($originatorName);
         $this->_originatorBankCode = trim($originatorBankCode);
         $this->_originatorAccount = trim($originatorAccount);
+        
+        if (strtoupper($type) == 'L') {
+            $this->_type = '05';
+        } else {
+            $this->_type = '51';
+        }
     }
     
     /**
@@ -143,7 +157,7 @@ class phpDTAUS
         $tmp  = 'C';
         $tmp .= '00000000';
         $tmp .= $this->_prepString($bankCode, array('length' => 8, 'fill' => FALSE));
-        $tmp .= $this->_prepString($account, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'left'));
+        $tmp .= $this->_prepString($account, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
         
         if ($customerId > 0) {
             $tmp .= $this->_prepString($customerId, array('length' => 13, 'fill' => TRUE, 'char' => '0', 'align' => 'left'));
@@ -216,7 +230,7 @@ class phpDTAUS
         
         $this->_entries[] = $tmp;
         
-        $this->_checksums['accountNumbers'] += $this->_prepString($account, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'left'));
+        $this->_checksums['accountNumbers'] += $this->_prepString($account, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
         $this->_checksums['bankCodes'] += $bankCode;
         $this->_checksums['amounts'] += $amount;
         
@@ -239,7 +253,7 @@ class phpDTAUS
         
         $csvTransactions = array();
         
-        if (($handle = fopen('test.csv', 'r')) !== FALSE) {
+        if (($handle = fopen($file, 'r')) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ';')) !== FALSE ) {
                 $csvTransactions[] = $data;
             }
@@ -256,6 +270,10 @@ class phpDTAUS
         
         for ($i = 0, $max = count($csvTransactions); $i < $max; $i++) {
             $tmp = $csvTransactions[$i];
+            
+            if (!is_array($tmp) || count($tmp) == 0) {
+                next;
+            }
             
             $name = $tmp[$mapping['name']];
             $bankcode = $tmp[$mapping['bankCode']];
@@ -305,7 +323,7 @@ class phpDTAUS
             }
             
             if (strlen($type) == 0) {
-                $type = '05';
+                $type = $this->_type;
             }
             
             if (strlen($customerId) == 0) {
@@ -580,7 +598,7 @@ class phpDTAUS
         
         $tmp .= date('dmy');
         $tmp .= '    ';
-        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => TRUE, 'char' => '0'));
+        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
         $tmp .= $this->_prepString($ref, array('length' => 10, 'fill' => TRUE, 'char' => '0'));
         $tmp .= '               ';
         
