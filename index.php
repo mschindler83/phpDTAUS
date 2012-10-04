@@ -30,16 +30,20 @@
  * program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Include the phpDTAUS class
 require_once 'phpDTAUS.php';
 
-$originator_name		= 'Mustermann AG';
-$originator_bankcode	= 10000000;
-$originator_account 	= 123456789;
-$type			        = 'L';
-$typeDetailed	      = '05';
+// Set some values we will need to create either the object or later the DTAUS file
+$originator_name = 'Mustermann AG';
+$originator_bankcode = 10000000;
+$originator_account  = 123456789;
+$type = 'L';
+$typeDetailed = '05';
 
+// Create the phpDTAUS object
 $dtaus = new phpDTAUS($originator_name, $originator_bankcode, $originator_account);
 
+// This mapping shows the readCsv method where (which column) to look for the required information in the CSV file
 $mapping = array(
 	'name' => 2,
 	'bankCode' => 3,
@@ -50,6 +54,10 @@ $mapping = array(
 	'customerId' => 1
 );
 
+// First, we try to read the CSV file. The readCsv method accepts three parameters:
+//     * the name of the CSV file (including path information),
+//     * the mapping of the CSV values, and
+//     * the default reference to be used for the transactions.
 try {
     $dtaus->readCsv('test.csv', $mapping, 'Produkt XY');
 } catch (Exception $e) {
@@ -58,6 +66,8 @@ try {
     echo $e->getTraceAsString();
 }
 
+// If a GET parameter 'file' is present and has the value '1', we will output the DTAUS file as plain text and make
+// it downloadable. Otherwise we just print the DTAUS contents to the screen.
 if( !empty($_GET['file']) && $_GET['file'] == '1' ) {
 	header('Content-Disposition:attachment; filename=dtaus0.txt');
 	header('Content-type:text/plain' );
