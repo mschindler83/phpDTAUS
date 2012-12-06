@@ -156,11 +156,11 @@ class phpDTAUS
     {
         $tmp  = 'C';
         $tmp .= '00000000';
-        $tmp .= $this->_prepString($bankCode, array('length' => 8, 'fill' => FALSE));
-        $tmp .= $this->_prepString($account, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString($bankCode, array('length' => 8, 'fill' => false));
+        $tmp .= $this->_prepString($account, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'right'));
         
         if ($customerId > 0) {
-            $tmp .= $this->_prepString($customerId, array('length' => 13, 'fill' => TRUE, 'char' => '0', 'align' => 'left'));
+            $tmp .= $this->_prepString($customerId, array('length' => 13, 'fill' => true, 'char' => '0', 'align' => 'left'));
         } else {
             $tmp .= '0000000000000';
         }
@@ -170,11 +170,11 @@ class phpDTAUS
         $tmp .= ' ';
         $tmp .= '00000000000';
         $tmp .= $this->_originatorBankCode;
-        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'left'));
-        $tmp .= $this->_prepString(number_format($amount, 2, '', ''), array('length' => 11, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'left'));
+        $tmp .= $this->_prepString(number_format($amount, 2, '', ''), array('length' => 11, 'fill' => true, 'char' => '0', 'align' => 'right'));
         $tmp .= '   ';
         
-        $tmpExt = $this->_prepString($name, array('length' => 27, 'fill' => TRUE, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => TRUE, 'truncate' => TRUE, 'multiline' => TRUE, 'maxLines' => 2));
+        $tmpExt = $this->_prepString($name, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => true, 'truncate' => true, 'multiline' => true, 'maxLines' => 2));
         
         if (is_array($tmpExt)) {
             $this->_extensions[] = array('03', $tmpExt[1]);
@@ -184,9 +184,9 @@ class phpDTAUS
         }
         
         $tmp .= '        ';
-        $tmp .= $this->_prepString($this->_originatorName, array('length' => 27, 'fill' => TRUE, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => TRUE, 'mutliline' => TRUE));
+        $tmp .= $this->_prepString($this->_originatorName, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => true, 'mutliline' => true));
         
-        $tmpExt = $this->_prepString($ref, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => TRUE, 'truncate' => TRUE, 'multiline' => TRUE, 'maxLines' => 13));
+        $tmpExt = $this->_prepString($ref, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => true, 'truncate' => true, 'multiline' => true, 'maxLines' => 13));
         
         if (is_array($tmpExt)) {
             for ($i=1, $m=count($tmpExt)-1; $i<$m; $i++) {
@@ -202,7 +202,7 @@ class phpDTAUS
         
         $cntExt = count($this->_extensions);
         
-        $tmp .= $this->_prepString($cntExt, array('length' => 2, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString($cntExt, array('length' => 2, 'fill' => true, 'char' => '0', 'align' => 'right'));
         
         if ($cntExt == 0) {
             $tmp .= '                             ';
@@ -226,11 +226,11 @@ class phpDTAUS
         }
         
         $recLength = 187 + $cntExt * 29;
-        $tmp = $this->_prepString($recLength, array('length' => 4, 'fill' => TRUE, 'char' => '0', 'align' => 'right')) . $tmp;
+        $tmp = $this->_prepString($recLength, array('length' => 4, 'fill' => true, 'char' => '0', 'align' => 'right')) . $tmp;
         
         $this->_entries[] = $tmp;
         
-        $this->_checksums['accountNumbers'] += $this->_prepString($account, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
+        $this->_checksums['accountNumbers'] += $this->_prepString($account, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'right'));
         $this->_checksums['bankCodes'] += $bankCode;
         $this->_checksums['amounts'] += $amount;
         
@@ -253,8 +253,8 @@ class phpDTAUS
         
         $csvTransactions = array();
         
-        if (($handle = fopen($file, 'r')) !== FALSE) {
-            while (($data = fgetcsv($handle, 1000, ';')) !== FALSE ) {
+        if (($handle = fopen($file, 'r')) !== false) {
+            while (($data = fgetcsv($handle, 1000, ';')) !== false ) {
                 $csvTransactions[] = $data;
             }
             fclose($handle);
@@ -397,25 +397,17 @@ class phpDTAUS
         }
         
         // Set options from $options array
-        $len = (!array_key_exists('length', $options) || strlen(trim($options['length'])) == 0) ? 10 : $options['length'];
-        $fill = (!array_key_exists('fill', $options) || !is_bool($options['fill'])) ? TRUE : $options['fill'];
-        $char = (!array_key_exists('char', $options) || strlen(trim($options['char'])) == 0) ? ' ' : $options['char'];
+        $len = (!array_key_exists('length', $options) || (int) $options['length'] == 0) ? 10 : (int) $options['length'];
+        $fill = (!array_key_exists('fill', $options) || !is_bool($options['fill'])) ? true : $options['fill'];
+        $char = (!array_key_exists('char', $options) || strlen(trim($options['char']) == 0) ? ' ' : (int) $options['char'];
         $align = (!array_key_exists('align', $options) || strlen(trim($options['align'])) == 0) ? 'left' : $options['align'];
         $transform = (!array_key_exists('transform', $options) || strlen(trim($options['transform'])) == 0) ? 'none' : $options['transform'];
-        $replaceUmlauts = (!array_key_exists('replaceUmlauts', $options) || !is_bool($options['replaceUmlauts'])) ? FALSE : $options['replaceUmlauts'];
-        $truncate = (!array_key_exists('truncate', $options) || !is_bool($options['truncate'])) ? FALSE : $options['truncate'];
-        $multiline = (!array_key_exists('multiline', $options) || !is_bool($options['multiline'])) ? FALSE : $options['multiline'];
-        $maxLines = (!array_key_exists('maxLines', $options) || strlen(trim($options['maxLines'])) == 0) ? 0 : $options['maxLines'];
+        $replaceUmlauts = (!array_key_exists('replaceUmlauts', $options) || !is_bool($options['replaceUmlauts'])) ? false : $options['replaceUmlauts'];
+        $truncate = (!array_key_exists('truncate', $options) || !is_bool($options['truncate'])) ? false : $options['truncate'];
+        $multiline = (!array_key_exists('multiline', $options) || !is_bool($options['multiline'])) ? false : $options['multiline'];
+        $maxLines = (!array_key_exists('maxLines', $options) || (int) $options['maxLines'] == 0) ? 0 : (int) $options['maxLines'];
         
-        // Check options
-        if (intval($len).'' != $len) {
-            throw new InvalidArgumentException('Option \'length\' must be an integer value. [' . intval($len).'' . '] | [' . $len . ']');
-        }
-        
-        if ($fill !== TRUE && $fill !== FALSE) {
-            throw new InvalidArgumentException('Option \'fill\' must be of type Boolean.');
-        }
-        
+        // Check options        
         if (strlen(trim($char)) > 1) {
             throw new InvalidArgumentException('Option \'char\' cannot exceed one character.');
         }
@@ -427,23 +419,7 @@ class phpDTAUS
         if ($transform != 'upper' && $transform != 'lower' && $transform != 'none') {
             throw new InvalidArgumentException('Option \'transform\' must be \'upper\', \'lower\', or \'none\'.');
         }
-        
-        if ($replaceUmlauts !== TRUE && $replaceUmlauts !== FALSE) {
-            throw new InvalidArgumentException('Option \'replaceUmlauts\' must be of type Boolean.');
-        }
-        
-        if ($truncate !== TRUE && $truncate !== FALSE) {
-            throw new InvalidArgumentException('Option \'truncate\' must be of type Boolean.');
-        }
-        
-        if ($multiline !== TRUE && $multiline !== FALSE) {
-            throw new InvalidArgumentException('Option \'mutliline\' must be of type Boolean.');
-        }
-        
-        if (intval($maxLines).'' != $maxLines) {
-            throw new InvalidArgumentException('Option \'maxLines\' must be of type Integer.');
-        }
-        
+
         // Process string
         
         // Transliterate German umlauts if required and the German 'ß'. This has to be done first,
@@ -451,18 +427,14 @@ class phpDTAUS
         if ($replaceUmlauts) {
             
             // Umlauts are transliterated by appending an 'e' to the base vowel.
-            $str = str_replace( 'ä', 'ae', $str );
-            $str = str_replace( 'ö', 'oe', $str );
-            $str = str_replace( 'ü', 'ue', $str );
-            $str = str_replace( 'Ä', 'Ae', $str );
-            $str = str_replace( 'Ö', 'Oe', $str );
-            $str = str_replace( 'Ü', 'Ue', $str );
-            
+            $str = str_replace(
+                array('ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü', 'ß'),
+                array('ae', 'oe', 'ue', 'Ae', 'Oe', 'Ue', 'ss'),
+                $str
+            );
+
         }
-        
-        // The German 'ß' is always replaced by 'ss'.
-        $str = str_replace('ß', 'ss', $str);
-        
+
         // Next we transform the string to upper or lower case, if requested
         if ($transform == 'upper') {
             $str = strtoupper($str);
@@ -525,11 +497,11 @@ class phpDTAUS
         $tmp  = '0128';
         $tmp .= 'E';
         $tmp .= '     ';
-        $tmp .= $this->_prepString(count($this->_entries), array('length' => 7, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString(count($this->_entries), array('length' => 7, 'fill' => true, 'char' => '0', 'align' => 'right'));
         $tmp .= '0000000000000';
-        $tmp .= $this->_prepString($this->_checksums['accountNumbers'], array('length' => 17, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
-        $tmp .= $this->_prepString($this->_checksums['bankCodes'], array('length' => 17, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
-        $tmp .= $this->_prepString(number_format($this->_checksums['amounts'], 2, '', ''), array('length' => 13, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString($this->_checksums['accountNumbers'], array('length' => 17, 'fill' => true, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString($this->_checksums['bankCodes'], array('length' => 17, 'fill' => true, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString(number_format($this->_checksums['amounts'], 2, '', ''), array('length' => 13, 'fill' => true, 'char' => '0', 'align' => 'right'));
         $tmp .= '                                                   ';
         
         return $tmp;
@@ -579,13 +551,13 @@ class phpDTAUS
         
         $tmpExt = $this->_prepString($this->_originatorName, array(
             'length' => 27,
-            'fill' => TRUE,
+            'fill' => true,
             'char' => ' ',
             'align' => 'left',
             'transform' => 'upper',
-            'replaceUmlauts' => TRUE,
-            'truncate' => TRUE,
-            'mutliline' => TRUE,
+            'replaceUmlauts' => true,
+            'truncate' => true,
+            'mutliline' => true,
             'maxLines' => 2
         ));
         
@@ -598,8 +570,8 @@ class phpDTAUS
         
         $tmp .= date('dmy');
         $tmp .= '    ';
-        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => TRUE, 'char' => '0', 'align' => 'right'));
-        $tmp .= $this->_prepString($ref, array('length' => 10, 'fill' => TRUE, 'char' => '0'));
+        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'right'));
+        $tmp .= $this->_prepString($ref, array('length' => 10, 'fill' => true, 'char' => '0'));
         $tmp .= '               ';
         
         if (strlen($execDate) == 8) {
