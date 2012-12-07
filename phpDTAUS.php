@@ -160,7 +160,17 @@ class phpDTAUS
         $tmp .= $this->_prepString($account, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'right'));
 
         if ($customerId > 0) {
-            $tmp .= $this->_prepString($customerId, array('length' => 13, 'fill' => true, 'char' => '0', 'align' => 'left'));
+
+            $tmp .= $this->_prepString(
+                $customerId,
+                array(
+                    'length' => 13,
+                    'fill' => true,
+                    'char' => '0',
+                    'align' => 'left'
+                )
+            );
+
         } else {
             $tmp .= '0000000000000';
         }
@@ -170,11 +180,43 @@ class phpDTAUS
         $tmp .= ' ';
         $tmp .= '00000000000';
         $tmp .= $this->_originatorBankCode;
-        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'left'));
-        $tmp .= $this->_prepString(number_format($amount, 2, '', ''), array('length' => 11, 'fill' => true, 'char' => '0', 'align' => 'right'));
+
+        $tmp .= $this->_prepString(
+            $this->_originatorAccount,
+            array(
+                'length' => 10,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'left'
+            )
+        );
+
+        $tmp .= $this->_prepString(
+            number_format($amount, 2, '', ''),
+            array(
+                'length' => 11,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
         $tmp .= '   ';
 
-        $tmpExt = $this->_prepString($name, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => true, 'truncate' => true, 'multiline' => true, 'maxLines' => 2));
+        $tmpExt = $this->_prepString(
+            $name,
+            array(
+                'length' => 27,
+                'fill' => true,
+                'char' => ' ',
+                'align' => 'left',
+                'transform' => 'upper',
+                'replaceUmlauts' => true,
+                'truncate' => true,
+                'multiline' => true,
+                'maxLines' => 2
+            )
+        );
 
         if (is_array($tmpExt)) {
             $this->_extensions[] = array('03', $tmpExt[1]);
@@ -184,9 +226,34 @@ class phpDTAUS
         }
 
         $tmp .= '        ';
-        $tmp .= $this->_prepString($this->_originatorName, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => true, 'mutliline' => true));
 
-        $tmpExt = $this->_prepString($ref, array('length' => 27, 'fill' => true, 'char' => ' ', 'align' => 'left', 'transform' => 'upper', 'replaceUmlauts' => true, 'truncate' => true, 'multiline' => true, 'maxLines' => 13));
+        $tmp .= $this->_prepString(
+            $this->_originatorName,
+            array(
+                'length' => 27,
+                'fill' => true,
+                'char' => ' ',
+                'align' => 'left',
+                'transform' => 'upper',
+                'replaceUmlauts' => true,
+                'mutliline' => true
+            )
+        );
+
+        $tmpExt = $this->_prepString(
+            $ref,
+            array(
+                'length' => 27,
+                'fill' => true,
+                'char' => ' ',
+                'align' => 'left',
+                'transform' => 'upper',
+                'replaceUmlauts' => true,
+                'truncate' => true,
+                'multiline' => true,
+                'maxLines' => 13
+            )
+        );
 
         if (is_array($tmpExt)) {
             for ($i=1, $m=count($tmpExt)-1; $i<$m; $i++) {
@@ -226,11 +293,29 @@ class phpDTAUS
         }
 
         $recLength = 187 + $cntExt * 29;
-        $tmp = $this->_prepString($recLength, array('length' => 4, 'fill' => true, 'char' => '0', 'align' => 'right')) . $tmp;
+
+        $tmp = $this->_prepString(
+            $recLength,
+            array(
+                'length' => 4,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        ) . $tmp;
 
         $this->_entries[] = $tmp;
 
-        $this->_checksums['accountNumbers'] += $this->_prepString($account, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'right'));
+        $this->_checksums['accountNumbers'] += $this->_prepString(
+            $account,
+            array(
+                'length' => 10,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
         $this->_checksums['bankCodes'] += $bankCode;
         $this->_checksums['amounts'] += $amount;
 
@@ -455,7 +540,7 @@ class phpDTAUS
         } elseif ($truncate && (strlen($str) > $len) && !$multiline ) {
             $returnArray = array(substr($str, 0, $len));
         } elseif (! $truncate && (strlen($str) > $len)) {
-            throw new LengthException('String ' . $str . ' is too long and truncating it has been pohibited.');
+            throw new LengthException('String ' . $str . ' is too long and truncating it has been prohibited.');
             //echo $str . ' LENGTH EXCEPTION<hr />';
         } else {
             $returnArray = array($str);
@@ -498,11 +583,49 @@ class phpDTAUS
         $tmp  = '0128';
         $tmp .= 'E';
         $tmp .= '     ';
-        $tmp .= $this->_prepString(count($this->_entries), array('length' => 7, 'fill' => true, 'char' => '0', 'align' => 'right'));
+
+        $tmp .= $this->_prepString(
+            count($this->_entries),
+            array(
+                'length' => 7,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
         $tmp .= '0000000000000';
-        $tmp .= $this->_prepString($this->_checksums['accountNumbers'], array('length' => 17, 'fill' => true, 'char' => '0', 'align' => 'right'));
-        $tmp .= $this->_prepString($this->_checksums['bankCodes'], array('length' => 17, 'fill' => true, 'char' => '0', 'align' => 'right'));
-        $tmp .= $this->_prepString(number_format($this->_checksums['amounts'], 2, '', ''), array('length' => 13, 'fill' => true, 'char' => '0', 'align' => 'right'));
+
+        $tmp .= $this->_prepString(
+            $this->_checksums['accountNumbers'],
+            array(
+                'length' => 17,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
+        $tmp .= $this->_prepString(
+            $this->_checksums['bankCodes'],
+            array(
+                'length' => 17,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
+        $tmp .= $this->_prepString(
+            number_format($this->_checksums['amounts'], 2, '', ''),
+            array(
+                'length' => 13,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
         $tmp .= '                                                   ';
 
         return $tmp;
@@ -551,17 +674,19 @@ class phpDTAUS
         $tmp .= $this->_originatorBankCode;
         $tmp .= '00000000';
 
-        $tmpExt = $this->_prepString($this->_originatorName, array(
-            'length' => 27,
-            'fill' => true,
-            'char' => ' ',
-            'align' => 'left',
-            'transform' => 'upper',
-            'replaceUmlauts' => true,
-            'truncate' => true,
-            'mutliline' => true,
-            'maxLines' => 2
-        ));
+        $tmpExt = $this->_prepString(
+            $this->_originatorName, array(
+                'length' => 27,
+                'fill' => true,
+                'char' => ' ',
+                'align' => 'left',
+                'transform' => 'upper',
+                'replaceUmlauts' => true,
+                'truncate' => true,
+                'mutliline' => true,
+                'maxLines' => 2
+            )
+        );
 
         if (is_array($tmpExt)) {
             $this->_extensions[] = array('01', $tmpExt[1]);
@@ -572,7 +697,17 @@ class phpDTAUS
 
         $tmp .= date('dmy');
         $tmp .= '    ';
-        $tmp .= $this->_prepString($this->_originatorAccount, array('length' => 10, 'fill' => true, 'char' => '0', 'align' => 'right'));
+
+        $tmp .= $this->_prepString(
+            $this->_originatorAccount,
+            array(
+                'length' => 10,
+                'fill' => true,
+                'char' => '0',
+                'align' => 'right'
+            )
+        );
+
         $tmp .= $this->_prepString($ref, array('length' => 10, 'fill' => true, 'char' => '0'));
         $tmp .= '               ';
 
